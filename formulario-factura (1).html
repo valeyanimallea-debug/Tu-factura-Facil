@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pedí tu factura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F7F5F0;
+    --card:#FFFFFF;
+    --ink:#1B2A4A;
+    --ink-soft:#5B6478;
+    --muted:#8A8577;
+    --border:#E2DED2;
+    --border-strong:#CFC9B8;
+    --emisor:#0F6659;
+    --emisor-bg:#E7F1EE;
+    --receptor:#B5502C;
+    --receptor-bg:#F5E9E1;
+    --danger:#B3261E;
+    --success:#0F6659;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    font-family:'IBM Plex Sans', sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:32px 16px;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    max-width:460px;
+    width:100%;
+    overflow:hidden;
+    box-shadow:0 1px 2px rgba(27,42,74,0.04);
+  }
+  .head{
+    padding:18px 22px;
+    border-bottom:1px dashed var(--border-strong);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .head p{margin:0;}
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--muted);
+    letter-spacing:0.02em;
+    margin-bottom:2px !important;
+  }
+  .title{font-size:17px; font-weight:600;}
+  .badge{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--ink);
+    background:var(--paper);
+    border:1px solid var(--border-strong);
+    padding:4px 10px;
+    border-radius:20px;
+  }
+  .body{padding:22px;}
+  .tag{
+    display:inline-block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    padding:2px 9px;
+    border-radius:20px;
+    margin-bottom:10px;
+  }
+  .tag.emisor{color:var(--emisor); background:var(--emisor-bg);}
+  .tag.receptor{color:var(--receptor); background:var(--receptor-bg);}
+  .step-desc{font-size:13px; color:var(--ink-soft); margin:0 0 16px;}
+  label{
+    display:block;
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-bottom:5px;
+    font-weight:500;
+  }
+  input, select{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid var(--border-strong);
+    border-radius:8px;
+    font-size:14px;
+    font-family:'IBM Plex Sans', sans-serif;
+    color:var(--ink);
+    background:var(--card);
+    margin-bottom:14px;
+    outline:none;
+  }
+  input:focus, select:focus{border-color:var(--emisor);}
+  input[data-mono]{font-family:'IBM Plex Mono', monospace;}
+  .err{
+    display:none;
+    font-size:12px;
+    color:var(--danger);
+    margin:-10px 0 14px;
+  }
+  .review-block{
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:12px 14px;
+    font-size:13px;
+    margin-bottom:12px;
+  }
+  .review-row{
+    display:flex;
+    justify-content:space-between;
+    padding:3px 0;
+    gap:12px;
+  }
+  .review-row span:first-child{color:var(--ink-soft);}
+  .review-row span:last-child{font-weight:500; text-align:right;}
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  .actions{display:flex; gap:8px; margin-top:20px;}
+  button{
+    flex:1;
+    padding:11px 14px;
+    border-radius:8px;
+    border:1px solid var(--border-strong);
+    background:var(--card);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:14px;
+    font-weight:500;
+    cursor:pointer;
+  }
+  button.primary{
+    background:var(--ink);
+    color:#fff;
+    border-color:var(--ink);
+    flex:2;
+  }
+  button.wa{background:#1B6D4C; color:#fff; border-color:#1B6D4C;}
+  button.mail{background:var(--card); color:var(--ink);}
+  button:hover{opacity:0.92;}
+  .hidden{display:none !important;}
+  .success-icon{
+    width:44px; height:44px; border-radius:50%;
+    background:var(--emisor-bg);
+    display:flex; align-items:center; justify-content:center;
+    margin:0 auto 14px;
+    color:var(--success);
+    font-size:20px;
+    font-weight:600;
+  }
+  .center{text-align:center;}
+  .small-muted{font-size:12.5px; color:var(--ink-soft); margin:0 0 16px;}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="head">
+    <div>
+      <p class="eyebrow">solicitud de comprobante</p>
+      <p class="title">Pedí tu factura</p>
+    </div>
+    <div class="badge" id="stepBadge">paso 1 de 4</div>
+  </div>
+
+  <div class="body">
+
+    <!-- PASO 1: EMISOR -->
+    <div id="step1">
+      <span class="tag emisor">emisor</span>
+      <p class="step-desc">A nombre de quién se emite la factura.</p>
+
+      <label for="eNombre">Razón social o nombre del emisor</label>
+      <input id="eNombre" type="text" placeholder="María López">
+      <div class="err" id="err-eNombre">Ingresá el nombre del emisor.</div>
+
+      <label for="eCuit">CUIT del emisor</label>
+      <input id="eCuit" type="text" data-mono placeholder="20-12345678-3">
+      <div class="err" id="err-eCuit">Ingresá un CUIT válido (11 dígitos).</div>
+
+      <label for="eIva">Condición frente al IVA del emisor</label>
+      <select id="eIva">
+        <option value="">Elegí una opción</option>
+        <option>Monotributista</option>
+        <option>Responsable inscripto</option>
+        <option>Exento</option>
+      </select>
+    </div>
+
+    <!-- PASO 2: RECEPTOR -->
+    <div id="step2" class="hidden">
+      <span class="tag receptor">receptor</span>
+      <p class="step-desc">A quién le está vendiendo el emisor en esta operación.</p>
+
+      <label for="rNombre">Nombre o razón social del receptor</label>
+      <input id="rNombre" type="text" placeholder="Juan Pérez">
+      <div class="err" id="err-rNombre">Ingresá el nombre del receptor.</div>
+
+      <label for="rCuit">CUIT / DNI del receptor</label>
+      <input id="rCuit" type="text" data-mono placeholder="27-87654321-5">
+      <div class="err" id="err-rCuit">Ingresá un CUIT o DNI válido.</div>
+
+      <label for="rIva">Condición frente al IVA del receptor</label>
+      <select id="rIva">
+        <option value="">Elegí una opción</option>
+        <option>Consumidor final</option>
+        <option>Monotributista</option>
+        <option>Responsable inscripto</option>
+        <option>Exento</option>
+      </select>
+    </div>
+
+    <!-- PASO 3: DETALLE -->
+    <div id="step3" class="hidden">
+      <p class="step-desc">Detalle de la operación.</p>
+
+      <label for="concepto">Concepto</label>
+      <input id="concepto" type="text" placeholder="Clases de guitarra, agosto">
+      <div class="err" id="err-concepto">Contá brevemente qué se está facturando.</div>
+
+      <label for="importe">Importe</label>
+      <input id="importe" type="number" data-mono placeholder="15000">
+      <div class="err" id="err-importe">Ingresá un importe mayor a cero.</div>
+
+      <label for="email">Tu email (para avisarte cuando esté lista)</label>
+      <input id="email" type="email" placeholder="juan@email.com">
+      <div class="err" id="err-email">Ingresá un email válido.</div>
+    </div>
+
+    <!-- PASO 4: REVISION Y ENVIO -->
+    <div id="step4" class="hidden">
+      <p class="step-desc">Revisá los datos antes de enviarlos.</p>
+
+      <div class="review-block">
+        <p class="mono" style="font-size:11px; color:var(--emisor); margin:0 0 6px;">emisor</p>
+        <div class="review-row"><span>Nombre</span><span id="rv-eNombre"></span></div>
+        <div class="review-row"><span>CUIT</span><span id="rv-eCuit" class="mono"></span></div>
+        <div class="review-row"><span>IVA</span><span id="rv-eIva"></span></div>
+      </div>
+
+      <div class="review-block">
+        <p class="mono" style="font-size:11px; color:var(--receptor); margin:0 0 6px;">receptor</p>
+        <div class="review-row"><span>Nombre</span><span id="rv-rNombre"></span></div>
+        <div class="review-row"><span>CUIT / DNI</span><span id="rv-rCuit" class="mono"></span></div>
+        <div class="review-row"><span>IVA</span><span id="rv-rIva"></span></div>
+      </div>
+
+      <div class="review-block">
+        <div class="review-row"><span>Concepto</span><span id="rv-concepto"></span></div>
+        <div class="review-row"><span>Importe</span><span id="rv-importe" class="mono"></span></div>
+      </div>
+
+      <p class="small-muted" style="margin-top:14px;">Elegí cómo enviar el pedido:</p>
+      <div class="actions" style="margin-top:0;">
+        <button type="button" class="wa" id="btnWA">Enviar por WhatsApp</button>
+        <button type="button" class="mail" id="btnMail">Enviar por email</button>
+      </div>
+    </div>
+
+    <!-- PASO 5: CONFIRMACION -->
+    <div id="step5" class="hidden center">
+      <div class="success-icon">✓</div>
+      <p style="font-weight:600; font-size:15px; margin:0 0 4px;">¡Listo!</p>
+      <p class="small-muted">Tu pedido se envió. Te va a llegar el comprobante con el CAE por email en cuanto se cargue.</p>
+    </div>
+
+    <div class="actions" id="navActions">
+      <button type="button" id="btnBack" class="hidden">Atrás</button>
+      <button type="button" id="btnNext" class="primary">Continuar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ======= CONFIGURACIÓN ======= */
+const WHATSAPP_NUMBER = "5492645567660"; // código país + área sin 0 ni 15, sin espacios ni guiones
+const EMAIL_TO = "valeyanimallea@gmail.com";
+/* ============================== */
+
+let step = 1;
+const totalSteps = 4;
+const stepBadge = document.getElementById('stepBadge');
+const btnBack = document.getElementById('btnBack');
+const btnNext = document.getElementById('btnNext');
+const navActions = document.getElementById('navActions');
+
+function showStep(n){
+  for(let i=1;i<=5;i++){
+    document.getElementById('step'+i).classList.toggle('hidden', i!==n);
+  }
+  btnBack.classList.toggle('hidden', !(n>1 && n<5));
+  if(n===5){
+    navActions.classList.add('hidden');
+  } else {
+    navActions.classList.remove('hidden');
+    btnNext.classList.toggle('hidden', n===4);
+  }
+  if(n<=totalSteps){
+    stepBadge.classList.remove('hidden');
+    stepBadge.textContent = 'paso ' + n + ' de ' + totalSteps;
+  } else {
+    stepBadge.classList.add('hidden');
+  }
+}
+
+function showErr(id){ document.getElementById('err-'+id).style.display = 'block'; }
+function hideErr(id){ document.getElementById('err-'+id).style.display = 'none'; }
+
+function validateStep1(){
+  let ok = true;
+  const nombre = document.getElementById('eNombre').value.trim();
+  const cuit = document.getElementById('eCuit').value.replace(/[^0-9]/g,'');
+  hideErr('eNombre'); hideErr('eCuit');
+  if(!nombre){ showErr('eNombre'); ok=false; }
+  if(cuit.length !== 11){ showErr('eCuit'); ok=false; }
+  return ok;
+}
+
+function validateStep2(){
+  let ok = true;
+  const nombre = document.getElementById('rNombre').value.trim();
+  const cuit = document.getElementById('rCuit').value.replace(/[^0-9]/g,'');
+  hideErr('rNombre'); hideErr('rCuit');
+  if(!nombre){ showErr('rNombre'); ok=false; }
+  if(cuit.length < 7){ showErr('rCuit'); ok=false; }
+  return ok;
+}
+
+function validateStep3(){
+  let ok = true;
+  const concepto = document.getElementById('concepto').value.trim();
+  const importe = parseFloat(document.getElementById('importe').value);
+  const email = document.getElementById('email').value.trim();
+  hideErr('concepto'); hideErr('importe'); hideErr('email');
+  if(!concepto){ showErr('concepto'); ok=false; }
+  if(!importe || importe<=0){ showErr('importe'); ok=false; }
+  if(!/^\S+@\S+\.\S+$/.test(email)){ showErr('email'); ok=false; }
+  return ok;
+}
+
+function fillReview(){
+  document.getElementById('rv-eNombre').textContent = document.getElementById('eNombre').value.trim();
+  document.getElementById('rv-eCuit').textContent = document.getElementById('eCuit').value.trim();
+  document.getElementById('rv-eIva').textContent = document.getElementById('eIva').value || 'Sin especificar';
+  document.getElementById('rv-rNombre').textContent = document.getElementById('rNombre').value.trim();
+  document.getElementById('rv-rCuit').textContent = document.getElementById('rCuit').value.trim();
+  document.getElementById('rv-rIva').textContent = document.getElementById('rIva').value || 'Sin especificar';
+  document.getElementById('rv-concepto').textContent = document.getElementById('concepto').value.trim();
+  const importe = parseFloat(document.getElementById('importe').value) || 0;
+  document.getElementById('rv-importe').textContent = '$' + importe.toLocaleString('es-AR');
+}
+
+function buildMessage(){
+  const importe = parseFloat(document.getElementById('importe').value) || 0;
+  const lines = [
+    "Pedido de factura",
+    "",
+    "EMISOR",
+    "Nombre: " + document.getElementById('eNombre').value.trim(),
+    "CUIT: " + document.getElementById('eCuit').value.trim(),
+    "IVA: " + (document.getElementById('eIva').value || "Sin especificar"),
+    "",
+    "RECEPTOR",
+    "Nombre: " + document.getElementById('rNombre').value.trim(),
+    "CUIT/DNI: " + document.getElementById('rCuit').value.trim(),
+    "IVA: " + (document.getElementById('rIva').value || "Sin especificar"),
+    "",
+    "DETALLE",
+    "Concepto: " + document.getElementById('concepto').value.trim(),
+    "Importe: $" + importe.toLocaleString('es-AR'),
+    "Email de contacto: " + document.getElementById('email').value.trim()
+  ];
+  return lines.join("\n");
+}
+
+btnNext.addEventListener('click', () => {
+  if(step===1){ if(!validateStep1()) return; step=2; }
+  else if(step===2){ if(!validateStep2()) return; step=3; }
+  else if(step===3){ if(!validateStep3()) return; step=4; fillReview(); }
+  showStep(step);
+});
+
+btnBack.addEventListener('click', () => {
+  step = Math.max(1, step-1);
+  showStep(step);
+});
+
+document.getElementById('btnWA').addEventListener('click', () => {
+  const msg = encodeURIComponent(buildMessage());
+  window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + msg, '_blank');
+  step = 5;
+  showStep(step);
+});
+
+document.getElementById('btnMail').addEventListener('click', () => {
+  const subject = encodeURIComponent('Pedido de factura - ' + document.getElementById('rNombre').value.trim());
+  const body = encodeURIComponent(buildMessage());
+  window.location.href = 'mailto:' + EMAIL_TO + '?subject=' + subject + '&body=' + body;
+  step = 5;
+  showStep(step);
+});
+
+showStep(1);
+</script>
+
+</body>
+</html>
