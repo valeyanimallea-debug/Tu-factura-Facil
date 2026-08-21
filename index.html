@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pedí tu factura</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=PT+Serif:wght@400;700&family=PT+Sans:wght@400;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#F7F5F0;
@@ -26,7 +26,7 @@
   body{
     margin:0;
     background:var(--paper);
-    font-family:'IBM Plex Sans', sans-serif;
+    font-family:'PT Sans', Arial, sans-serif;
     color:var(--ink);
     min-height:100vh;
     display:flex;
@@ -37,7 +37,7 @@
   .card{
     background:var(--card);
     border:1px solid var(--border);
-    border-radius:14px;
+    border-radius:6px;
     max-width:460px;
     width:100%;
     overflow:hidden;
@@ -52,30 +52,33 @@
   }
   .head p{margin:0;}
   .eyebrow{
-    font-family:'IBM Plex Mono', monospace;
+    font-family:'Roboto Mono', monospace;
     font-size:11px;
     color:var(--muted);
-    letter-spacing:0.02em;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
     margin-bottom:2px !important;
   }
-  .title{font-size:17px; font-weight:600;}
+  .title{font-family:'PT Serif', Georgia, serif; font-size:19px; font-weight:700;}
   .badge{
-    font-family:'IBM Plex Mono', monospace;
+    font-family:'Roboto Mono', monospace;
     font-size:12px;
     color:var(--ink);
     background:var(--paper);
     border:1px solid var(--border-strong);
     padding:4px 10px;
-    border-radius:20px;
+    border-radius:4px;
   }
   .body{padding:22px;}
   .tag{
     display:inline-block;
-    font-family:'IBM Plex Mono', monospace;
+    font-family:'Roboto Mono', monospace;
     font-size:11px;
     padding:2px 9px;
-    border-radius:20px;
+    border-radius:4px;
     margin-bottom:10px;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
   }
   .tag.emisor{color:var(--emisor); background:var(--emisor-bg);}
   .tag.receptor{color:var(--receptor); background:var(--receptor-bg);}
@@ -91,16 +94,18 @@
     width:100%;
     padding:10px 12px;
     border:1px solid var(--border-strong);
-    border-radius:8px;
+    border-radius:4px;
     font-size:14px;
-    font-family:'IBM Plex Sans', sans-serif;
+    font-family:'PT Sans', Arial, sans-serif;
     color:var(--ink);
     background:var(--card);
     margin-bottom:14px;
     outline:none;
   }
   input:focus, select:focus{border-color:var(--emisor);}
-  input[data-mono]{font-family:'IBM Plex Mono', monospace;}
+  input[data-mono]{font-family:'Roboto Mono', monospace;}
+  .row2{display:flex; gap:10px;}
+  .row2 > div{flex:1;}
   .err{
     display:none;
     font-size:12px;
@@ -109,7 +114,7 @@
   }
   .review-block{
     border:1px solid var(--border);
-    border-radius:10px;
+    border-radius:4px;
     padding:12px 14px;
     font-size:13px;
     margin-bottom:12px;
@@ -122,18 +127,19 @@
   }
   .review-row span:first-child{color:var(--ink-soft);}
   .review-row span:last-child{font-weight:500; text-align:right;}
-  .mono{font-family:'IBM Plex Mono', monospace;}
+  .review-row.total span:last-child{font-size:15px;}
+  .mono{font-family:'Roboto Mono', monospace;}
   .actions{display:flex; gap:8px; margin-top:20px;}
   button{
     flex:1;
     padding:11px 14px;
-    border-radius:8px;
+    border-radius:4px;
     border:1px solid var(--border-strong);
     background:var(--card);
     color:var(--ink);
-    font-family:'IBM Plex Sans', sans-serif;
+    font-family:'PT Sans', Arial, sans-serif;
     font-size:14px;
-    font-weight:500;
+    font-weight:700;
     cursor:pointer;
   }
   button.primary{
@@ -167,7 +173,7 @@
       <p class="eyebrow">solicitud de comprobante</p>
       <p class="title">Pedí tu factura</p>
     </div>
-    <div class="badge" id="stepBadge">paso 1 de 4</div>
+    <div class="badge" id="stepBadge">paso 1 de 3</div>
   </div>
 
   <div class="body">
@@ -177,7 +183,7 @@
       <span class="tag emisor">emisor</span>
       <p class="step-desc">A nombre de quién se emite la factura.</p>
 
-      <label for="eNombre">Razón social o nombre del emisor</label>
+      <label for="eNombre">Nombre del emisor</label>
       <input id="eNombre" type="text" placeholder="María López">
       <div class="err" id="err-eNombre">Ingresá el nombre del emisor.</div>
 
@@ -192,50 +198,42 @@
         <option>Responsable inscripto</option>
         <option>Exento</option>
       </select>
+      <div class="err" id="err-eIva">Elegí una opción.</div>
     </div>
 
-    <!-- PASO 2: RECEPTOR -->
+    <!-- PASO 2: RECEPTOR Y DETALLE -->
     <div id="step2" class="hidden">
-      <span class="tag receptor">receptor</span>
-      <p class="step-desc">A quién le está vendiendo el emisor en esta operación.</p>
+      <span class="tag receptor">receptor y detalle</span>
+      <p class="step-desc">A quién le está vendiendo el emisor, y qué le vendió.</p>
 
-      <label for="rNombre">Nombre o razón social del receptor</label>
-      <input id="rNombre" type="text" placeholder="Juan Pérez">
-      <div class="err" id="err-rNombre">Ingresá el nombre del receptor.</div>
-
-      <label for="rCuit">CUIT / DNI del receptor</label>
+      <label for="rCuit">CUIT del receptor</label>
       <input id="rCuit" type="text" data-mono placeholder="27-87654321-5">
-      <div class="err" id="err-rCuit">Ingresá un CUIT o DNI válido.</div>
+      <div class="err" id="err-rCuit">Ingresá un CUIT válido.</div>
 
-      <label for="rIva">Condición frente al IVA del receptor</label>
-      <select id="rIva">
-        <option value="">Elegí una opción</option>
-        <option>Consumidor final</option>
-        <option>Monotributista</option>
-        <option>Responsable inscripto</option>
-        <option>Exento</option>
-      </select>
-    </div>
-
-    <!-- PASO 3: DETALLE -->
-    <div id="step3" class="hidden">
-      <p class="step-desc">Detalle de la operación.</p>
-
-      <label for="concepto">Concepto</label>
+      <label for="concepto">Descripción del producto o servicio</label>
       <input id="concepto" type="text" placeholder="Clases de guitarra, agosto">
       <div class="err" id="err-concepto">Contá brevemente qué se está facturando.</div>
 
-      <label for="importe">Importe</label>
-      <input id="importe" type="number" data-mono placeholder="15000">
-      <div class="err" id="err-importe">Ingresá un importe mayor a cero.</div>
+      <label>Precio unitario y cantidad</label>
+      <div class="row2">
+        <div>
+          <label for="precioUnitario" style="font-size:11px;">Precio unitario</label>
+          <input id="precioUnitario" type="number" data-mono placeholder="15000">
+        </div>
+        <div>
+          <label for="cantidad" style="font-size:11px;">Cantidad</label>
+          <input id="cantidad" type="number" data-mono placeholder="1">
+        </div>
+      </div>
+      <div class="err" id="err-cantidadPrecio">Ingresá un precio unitario y una cantidad mayores a cero.</div>
 
       <label for="email">Tu email (para avisarte cuando esté lista)</label>
       <input id="email" type="email" placeholder="juan@email.com">
       <div class="err" id="err-email">Ingresá un email válido.</div>
     </div>
 
-    <!-- PASO 4: REVISION Y ENVIO -->
-    <div id="step4" class="hidden">
+    <!-- PASO 3: REVISION Y ENVIO -->
+    <div id="step3" class="hidden">
       <p class="step-desc">Revisá los datos antes de enviarlos.</p>
 
       <div class="review-block">
@@ -246,15 +244,12 @@
       </div>
 
       <div class="review-block">
-        <p class="mono" style="font-size:11px; color:var(--receptor); margin:0 0 6px;">receptor</p>
-        <div class="review-row"><span>Nombre</span><span id="rv-rNombre"></span></div>
-        <div class="review-row"><span>CUIT / DNI</span><span id="rv-rCuit" class="mono"></span></div>
-        <div class="review-row"><span>IVA</span><span id="rv-rIva"></span></div>
-      </div>
-
-      <div class="review-block">
-        <div class="review-row"><span>Concepto</span><span id="rv-concepto"></span></div>
-        <div class="review-row"><span>Importe</span><span id="rv-importe" class="mono"></span></div>
+        <p class="mono" style="font-size:11px; color:var(--receptor); margin:0 0 6px;">receptor y detalle</p>
+        <div class="review-row"><span>CUIT del receptor</span><span id="rv-rCuit" class="mono"></span></div>
+        <div class="review-row"><span>Descripción</span><span id="rv-concepto"></span></div>
+        <div class="review-row"><span>Precio unitario</span><span id="rv-precioUnitario" class="mono"></span></div>
+        <div class="review-row"><span>Cantidad</span><span id="rv-cantidad" class="mono"></span></div>
+        <div class="review-row total"><span>Total</span><span id="rv-total" class="mono"></span></div>
       </div>
 
       <p class="small-muted" style="margin-top:14px;">Elegí cómo enviar el pedido:</p>
@@ -264,8 +259,8 @@
       </div>
     </div>
 
-    <!-- PASO 5: CONFIRMACION -->
-    <div id="step5" class="hidden center">
+    <!-- PASO 4: CONFIRMACION -->
+    <div id="step4" class="hidden center">
       <div class="success-icon">✓</div>
       <p style="font-weight:600; font-size:15px; margin:0 0 4px;">¡Listo!</p>
       <p class="small-muted">Tu pedido se envió. Te va a llegar el comprobante con el CAE por email en cuanto se cargue.</p>
@@ -280,27 +275,27 @@
 
 <script>
 /* ======= CONFIGURACIÓN ======= */
-const WHATSAPP_NUMBER = "5492645567660"; // código país + área sin 0 ni 15, sin espacios ni guiones
-const EMAIL_TO = "valeyanimallea@gmail.com";
+const WHATSAPP_NUMBER = "5492645567660"; // código país (54) + 9 + área (264) + número, sin 0 ni 15
+const EMAIL_TO = "asesoria.facturapro@gmail.com";
 /* ============================== */
 
 let step = 1;
-const totalSteps = 4;
+const totalSteps = 3;
 const stepBadge = document.getElementById('stepBadge');
 const btnBack = document.getElementById('btnBack');
 const btnNext = document.getElementById('btnNext');
 const navActions = document.getElementById('navActions');
 
 function showStep(n){
-  for(let i=1;i<=5;i++){
+  for(let i=1;i<=4;i++){
     document.getElementById('step'+i).classList.toggle('hidden', i!==n);
   }
-  btnBack.classList.toggle('hidden', !(n>1 && n<5));
-  if(n===5){
+  btnBack.classList.toggle('hidden', !(n>1 && n<4));
+  if(n===4){
     navActions.classList.add('hidden');
   } else {
     navActions.classList.remove('hidden');
-    btnNext.classList.toggle('hidden', n===4);
+    btnNext.classList.toggle('hidden', n===3);
   }
   if(n<=totalSteps){
     stepBadge.classList.remove('hidden');
@@ -317,48 +312,54 @@ function validateStep1(){
   let ok = true;
   const nombre = document.getElementById('eNombre').value.trim();
   const cuit = document.getElementById('eCuit').value.replace(/[^0-9]/g,'');
-  hideErr('eNombre'); hideErr('eCuit');
+  const iva = document.getElementById('eIva').value;
+  hideErr('eNombre'); hideErr('eCuit'); hideErr('eIva');
   if(!nombre){ showErr('eNombre'); ok=false; }
   if(cuit.length !== 11){ showErr('eCuit'); ok=false; }
+  if(!iva){ showErr('eIva'); ok=false; }
   return ok;
 }
 
 function validateStep2(){
   let ok = true;
-  const nombre = document.getElementById('rNombre').value.trim();
   const cuit = document.getElementById('rCuit').value.replace(/[^0-9]/g,'');
-  hideErr('rNombre'); hideErr('rCuit');
-  if(!nombre){ showErr('rNombre'); ok=false; }
-  if(cuit.length < 7){ showErr('rCuit'); ok=false; }
+  const concepto = document.getElementById('concepto').value.trim();
+  const precio = parseFloat(document.getElementById('precioUnitario').value);
+  const cantidad = parseFloat(document.getElementById('cantidad').value);
+  const email = document.getElementById('email').value.trim();
+  hideErr('rCuit'); hideErr('concepto'); hideErr('cantidadPrecio'); hideErr('email');
+  if(cuit.length !== 11){ showErr('rCuit'); ok=false; }
+  if(!concepto){ showErr('concepto'); ok=false; }
+  if(!precio || precio<=0 || !cantidad || cantidad<=0){ showErr('cantidadPrecio'); ok=false; }
+  if(!/^\S+@\S+\.\S+$/.test(email)){ showErr('email'); ok=false; }
   return ok;
 }
 
-function validateStep3(){
-  let ok = true;
-  const concepto = document.getElementById('concepto').value.trim();
-  const importe = parseFloat(document.getElementById('importe').value);
-  const email = document.getElementById('email').value.trim();
-  hideErr('concepto'); hideErr('importe'); hideErr('email');
-  if(!concepto){ showErr('concepto'); ok=false; }
-  if(!importe || importe<=0){ showErr('importe'); ok=false; }
-  if(!/^\S+@\S+\.\S+$/.test(email)){ showErr('email'); ok=false; }
-  return ok;
+function calcularTotal(){
+  const precio = parseFloat(document.getElementById('precioUnitario').value) || 0;
+  const cantidad = parseFloat(document.getElementById('cantidad').value) || 0;
+  return precio * cantidad;
 }
 
 function fillReview(){
   document.getElementById('rv-eNombre').textContent = document.getElementById('eNombre').value.trim();
   document.getElementById('rv-eCuit').textContent = document.getElementById('eCuit').value.trim();
   document.getElementById('rv-eIva').textContent = document.getElementById('eIva').value || 'Sin especificar';
-  document.getElementById('rv-rNombre').textContent = document.getElementById('rNombre').value.trim();
+
   document.getElementById('rv-rCuit').textContent = document.getElementById('rCuit').value.trim();
-  document.getElementById('rv-rIva').textContent = document.getElementById('rIva').value || 'Sin especificar';
   document.getElementById('rv-concepto').textContent = document.getElementById('concepto').value.trim();
-  const importe = parseFloat(document.getElementById('importe').value) || 0;
-  document.getElementById('rv-importe').textContent = '$' + importe.toLocaleString('es-AR');
+
+  const precio = parseFloat(document.getElementById('precioUnitario').value) || 0;
+  const cantidad = parseFloat(document.getElementById('cantidad').value) || 0;
+  document.getElementById('rv-precioUnitario').textContent = '$' + precio.toLocaleString('es-AR');
+  document.getElementById('rv-cantidad').textContent = cantidad.toLocaleString('es-AR');
+  document.getElementById('rv-total').textContent = '$' + calcularTotal().toLocaleString('es-AR');
 }
 
 function buildMessage(){
-  const importe = parseFloat(document.getElementById('importe').value) || 0;
+  const precio = parseFloat(document.getElementById('precioUnitario').value) || 0;
+  const cantidad = parseFloat(document.getElementById('cantidad').value) || 0;
+  const total = calcularTotal();
   const lines = [
     "Pedido de factura",
     "",
@@ -367,14 +368,12 @@ function buildMessage(){
     "CUIT: " + document.getElementById('eCuit').value.trim(),
     "IVA: " + (document.getElementById('eIva').value || "Sin especificar"),
     "",
-    "RECEPTOR",
-    "Nombre: " + document.getElementById('rNombre').value.trim(),
-    "CUIT/DNI: " + document.getElementById('rCuit').value.trim(),
-    "IVA: " + (document.getElementById('rIva').value || "Sin especificar"),
-    "",
-    "DETALLE",
-    "Concepto: " + document.getElementById('concepto').value.trim(),
-    "Importe: $" + importe.toLocaleString('es-AR'),
+    "RECEPTOR Y DETALLE",
+    "CUIT del receptor: " + document.getElementById('rCuit').value.trim(),
+    "Descripción: " + document.getElementById('concepto').value.trim(),
+    "Precio unitario: $" + precio.toLocaleString('es-AR'),
+    "Cantidad: " + cantidad.toLocaleString('es-AR'),
+    "Total: $" + total.toLocaleString('es-AR'),
     "Email de contacto: " + document.getElementById('email').value.trim()
   ];
   return lines.join("\n");
@@ -382,8 +381,7 @@ function buildMessage(){
 
 btnNext.addEventListener('click', () => {
   if(step===1){ if(!validateStep1()) return; step=2; }
-  else if(step===2){ if(!validateStep2()) return; step=3; }
-  else if(step===3){ if(!validateStep3()) return; step=4; fillReview(); }
+  else if(step===2){ if(!validateStep2()) return; step=3; fillReview(); }
   showStep(step);
 });
 
@@ -395,15 +393,15 @@ btnBack.addEventListener('click', () => {
 document.getElementById('btnWA').addEventListener('click', () => {
   const msg = encodeURIComponent(buildMessage());
   window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + msg, '_blank');
-  step = 5;
+  step = 4;
   showStep(step);
 });
 
 document.getElementById('btnMail').addEventListener('click', () => {
-  const subject = encodeURIComponent('Pedido de factura - ' + document.getElementById('rNombre').value.trim());
+  const subject = encodeURIComponent('Pedido de factura - CUIT ' + document.getElementById('rCuit').value.trim());
   const body = encodeURIComponent(buildMessage());
   window.location.href = 'mailto:' + EMAIL_TO + '?subject=' + subject + '&body=' + body;
-  step = 5;
+  step = 4;
   showStep(step);
 });
 
