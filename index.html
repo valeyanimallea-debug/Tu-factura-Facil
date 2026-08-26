@@ -149,7 +149,6 @@
     flex:2;
   }
   button.wa{background:#1B6D4C; color:#fff; border-color:#1B6D4C;}
-  button.mail{background:var(--card); color:var(--ink);}
   button:hover{opacity:0.92;}
   .hidden{display:none !important;}
   .success-icon{
@@ -252,10 +251,9 @@
         <div class="review-row total"><span>Total</span><span id="rv-total" class="mono"></span></div>
       </div>
 
-      <p class="small-muted" style="margin-top:14px;">Elegí cómo enviar el pedido:</p>
+      <p class="small-muted" style="margin-top:14px;">Enviá el pedido:</p>
       <div class="actions" style="margin-top:0;">
-        <button type="button" class="wa" id="btnWA">Enviar por WhatsApp</button>
-        <button type="button" class="mail" id="btnMail">Enviar por email</button>
+        <button type="button" class="wa" id="btnWA" style="flex:1;">Enviar pedido por WhatsApp</button>
       </div>
     </div>
 
@@ -263,7 +261,7 @@
     <div id="step4" class="hidden center">
       <div class="success-icon">✓</div>
       <p style="font-weight:600; font-size:15px; margin:0 0 4px;">¡Listo!</p>
-      <p class="small-muted">Tu pedido se envió. Te va a llegar el comprobante con el CAE por email en cuanto se cargue.</p>
+      <p class="small-muted">Tu pedido se envió por WhatsApp. En cuanto se cargue la factura, te va a llegar el comprobante con el CAE.</p>
     </div>
 
     <div class="actions" id="navActions">
@@ -276,7 +274,6 @@
 <script>
 /* ======= CONFIGURACIÓN ======= */
 const WHATSAPP_NUMBER = "5492645567660"; // código país (54) + 9 + área (264) + número, sin 0 ni 15
-const EMAIL_TO = "asesoria.facturapro@gmail.com";
 /* ============================== */
 
 let step = 1;
@@ -393,15 +390,6 @@ btnBack.addEventListener('click', () => {
 document.getElementById('btnWA').addEventListener('click', () => {
   const msg = encodeURIComponent(buildMessage());
   window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + msg, '_blank');
-  step = 4;
-  showStep(step);
-});
-
-document.getElementById('btnMail').addEventListener('click', () => {
-  const subject = encodeURIComponent('Pedido de factura - CUIT ' + document.getElementById('rCuit').value.trim());
-  const body = encodeURIComponent(buildMessage());
-  const gmailUrl = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(EMAIL_TO) + '&su=' + subject + '&body=' + body;
-  window.open(gmailUrl, '_blank');
   step = 4;
   showStep(step);
 });
