@@ -400,7 +400,8 @@ document.getElementById('btnWA').addEventListener('click', () => {
 document.getElementById('btnMail').addEventListener('click', () => {
   const subject = encodeURIComponent('Pedido de factura - CUIT ' + document.getElementById('rCuit').value.trim());
   const body = encodeURIComponent(buildMessage());
-  window.location.href = 'mailto:' + EMAIL_TO + '?subject=' + subject + '&body=' + body;
+  const gmailUrl = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(EMAIL_TO) + '&su=' + subject + '&body=' + body;
+  window.open(gmailUrl, '_blank');
   step = 4;
   showStep(step);
 });
